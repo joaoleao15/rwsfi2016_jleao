@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   tf
+  rwsfi2016_libs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -119,26 +120,26 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(player_jleao
-#   src/${PROJECT_NAME}/player_jleao.cpp
-# )
+#add_library(player_jleao
+#src/${PROJECT_NAME}/player_jleao.cpp
+#)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(player_jleao ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#add_dependencies(player_jleao ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(player_jleao_node src/player_jleao_node.cpp)
+add_executable(player_jleao src/player_jleao.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(player_jleao_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(player_jleao ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(player_jleao_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(player_jleao
+${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
