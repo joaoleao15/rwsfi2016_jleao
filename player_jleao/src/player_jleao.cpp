@@ -95,7 +95,7 @@ public:
             string arena = "/map";
             move(msg.max_displacement, getAngleToPLayer(arena));
         }
-        /*else if(dist_min_hunter < near_player_distance)
+        else if(dist_min_hunter < near_player_distance)
         {
             double angle_temp = getAngleToPLayer(hunters_team->players[angleMinHunter]);
             finalAngle = angle_temp+M_PI;
@@ -103,7 +103,7 @@ public:
                 finalAngle = angle_temp-M_PI;
             move(msg.max_displacement,  finalAngle);
             bocas_msg.text = "Já Fui.";
-        }*/
+        }
         else
         {
             move(msg.max_displacement, getAngleToPLayer(msg.blue_alive[index_near_player]) );
