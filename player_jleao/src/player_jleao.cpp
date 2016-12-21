@@ -5,6 +5,7 @@
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 #include <rwsfi2016_libs/player.h>
+#include <rwsfi2016_msgs/GameQuery.h>
 
 /* _________________________________
    |                                 |
@@ -20,14 +21,25 @@ using namespace ros;
 class MyPlayer: public rwsfi2016_libs::Player
 {
 public:
-
-    ros::Publisher publisher;
-    visualization_msgs::Marker bocas_msg;
     /**
      * @brief Constructor, nothing to be done here
      * @param name player name
      * @param pet_name pet name
      */
+
+    bool respo(rwsfi2016_msgs::GameQuery::Request  &req,
+               rwsfi2016_msgs::GameQuery::Response &res)
+    {
+        res.resposta = "Hello";
+        return true;
+    }
+
+    ros::Publisher publisher;
+    ros::ServiceServer servico;
+    visualization_msgs::Marker bocas_msg;
+
+
+
     MyPlayer(string player_name, string pet_name="/dog"): Player(player_name, pet_name){
         publisher = node.advertise<visualization_msgs::Marker>("/bocas", 1);
         bocas_msg.header.frame_id = name;
@@ -41,6 +53,8 @@ public:
         bocas_msg.color.r = 0.0;
         bocas_msg.color.g = 0.0;
         bocas_msg.color.b = 0.0;
+
+        servico = node.advertiseService(name + "/game_query", &MyPlayer::respo, this);
     };
 
     void play(const rwsfi2016_msgs::MakeAPlay& msg)
@@ -81,7 +95,7 @@ public:
             string arena = "/map";
             move(msg.max_displacement, getAngleToPLayer(arena));
         }
-        else if(dist_min_hunter < near_player_distance)
+        /*else if(dist_min_hunter < near_player_distance)
         {
             double angle_temp = getAngleToPLayer(hunters_team->players[angleMinHunter]);
             finalAngle = angle_temp+M_PI;
@@ -89,7 +103,7 @@ public:
                 finalAngle = angle_temp-M_PI;
             move(msg.max_displacement,  finalAngle);
             bocas_msg.text = "Já Fui.";
-        }
+        }*/
         else
         {
             move(msg.max_displacement, getAngleToPLayer(msg.blue_alive[index_near_player]) );
