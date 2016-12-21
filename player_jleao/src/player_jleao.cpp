@@ -29,6 +29,8 @@ public:
 
     void play(const rwsfi2016_msgs::MakeAPlay& msg)
     {
+        double dist_min = 10000;
+        double angleMin = 10000;
         /* double near_player_distance = 1000.0;
         int index_near_player = 0;
 
@@ -78,7 +80,30 @@ public:
 
         if(msg.blue_alive.size() == 0)
         {
-
+            double dist_min_hunter = 100000;
+            double dist_hunter = 0;
+            int angleMinHunter = 0;
+            for (int pl=0; pl < hunters_team->players.size(); pl++) {
+                dist_hunter = getDistanceToPlayer(hunters_team->players[pl]);
+                if ((dist_hunter < dist_min_hunter) && (!isnan(dist_hunter))) {
+                    angleMinHunter = pl;
+                    dist_min_hunter = dist_hunter;
+                }
+            }
+            double finalAngle = 0.0;
+            if (dist_min_hunter < dist_min) {
+                ROS_INFO_STREAM("Hunter mais proximo: " << hunters_team->players[angleMinHunter] << " angle: " << getAngleToPLayer(hunters_team->players[angleMin]));
+                double angle_temp = getAngleToPLayer(hunters_team->players[angleMinHunter]);
+                finalAngle = angle_temp+M_PI;
+                if (angle_temp > 0)
+                    finalAngle = angle_temp-M_PI;
+                //MOVE//
+                if (getDistanceToArena() < 5) { // Evaluate if we are moving outside map
+                    move(msg.max_displacement, finalAngle);
+                } else {
+                    move(msg.max_displacement, angle_temp+(M_PI));
+                }
+            }
         }
         else
         {
