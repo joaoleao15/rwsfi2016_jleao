@@ -90,7 +90,7 @@ public:
             }
         }
         float finalAngle;
-        if (distance_to_arena > 6) //behaviour move to the center of arena
+        if (distance_to_arena > 7.3) //behaviour move to the center of arena
         {
             string arena = "/map";
             move(msg.max_displacement, getAngleToPLayer(arena));
