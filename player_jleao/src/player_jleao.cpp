@@ -27,91 +27,136 @@ public:
      */
     MyPlayer(string player_name, string pet_name="/dog"): Player(player_name, pet_name){};
 
-    /*void play(const rwsfi2016_msgs::MakeAPlay& msg)
+    void play(const rwsfi2016_msgs::MakeAPlay& msg)
     {
-        //Custom play behaviour. Now I will win the game
-        /*float ang_min = 9999;
-        int player_num = 0;
-
-        for(int i = 0; i < preys_team->players.size(); i++)
-        {
-                ang_min = getAngleToPLayer(preys_team->players[i]);
-                player_num = i;
-        }
-        move(msg.max_displacement, getAngleToPLayer(preys_team->players[player_num]));*/
-        /*double near_player_distance = 1000.0;
+       /* double near_player_distance = 1000.0;
         int index_near_player = 0;
 
         std::cout << "Number of Preys: "<< preys_team->players.size() << std::endl;
-
-        for(int i=0; i < preys_team->players.size(); i++)
+        std::cout << "Jogadores Vivos"<< msg.blue_alive[0] << std::endl;
+        if (msg.blue_alive.size() == 0)
         {
-            // std::cout << preys_team->players[i] << std::endl;
-            float distance = getDistanceToPlayer(preys_team->players[i]);
-            //std::cout << "Get Distance: "<< isnan(distance) << std::endl;
-
-
-            if( (distance < near_player_distance) && (!isnan(distance)))
-            {
-                near_player_distance = distance;
-                index_near_player    = i;
-                for(int j=0; i < my_team->players.size(); j++)
-                {
-                    float distance_myteam = getDistanceToPlayer(preys_team->players[j]);
-                    if ((distance_myteam < near_team_player_distance) && (!isnan(distance_myteam)))
-                    {
-                        near_player_distance = -distance;
-                        index_near_player    = i;
-                    }
-                }
-            }
-
-        }
-
-
-
-        //Behaviour follow the closest prey
-        move(msg.max_displacement, getAngleToPLayer(preys_team->players[index_near_player]) );
-    }*/
-    void play(const rwsfi2016_msgs::MakeAPlay& msg)
-    {
-        //Custom play behaviour. Now I will win the game
-
-        //Behaviour follow the closest prey
-        double dist_min = 100000;
-        int angleMin = 0;
-        double dist = 0;
-        for (int pl=0; pl < preys_team->players.size(); pl++) {
-            dist = getDistanceToPlayer(preys_team->players[pl]);
-            if ((dist < dist_min) && (!isnan(dist) ) ) {
-                angleMin = pl;
-                dist_min = dist;
-            }
-        }
-        double dist_min_hunter = 100000;
-        double dist_hunter = 0;
-        int angleMinHunter = 0;
-        for (int pl=0; pl < hunters_team->players.size(); pl++) {
-            dist_hunter = getDistanceToPlayer(hunters_team->players[pl]);
-            if ((dist_hunter < dist_min_hunter) && (!isnan(dist_hunter))) {
-                angleMinHunter = pl;
-                dist_min_hunter = dist_hunter;
-            }
-        }
-
-        double finalAngle = 0.0;
-        if (dist_min_hunter < dist_min) {
-            ROS_INFO_STREAM("Hunter mais proximo: " << hunters_team->players[angleMinHunter] << " angle: " << getAngleToPLayer(preys_team->players[angleMin]));
+            ROS_INFO_STREAM("Hunter mais proximo: " << hunters_team->players[angleMinHunter] << " angle: " << getAngleToPLayer(hunters_team->players[angleMin]));
             double angle_temp = getAngleToPLayer(hunters_team->players[angleMinHunter]);
             finalAngle = angle_temp+M_PI;
             if (angle_temp > 0)
                 finalAngle = angle_temp-M_PI;
             move(msg.max_displacement, finalAngle);
-        } else {
-            ROS_INFO_STREAM("Preyer mais proximo: " << preys_team->players[angleMin] << " angle: " << getAngleToPLayer(preys_team->players[angleMin]));
-            move(msg.max_displacement, getAngleToPLayer(preys_team->players[angleMin]));
         }
-    }
+        else
+        {
+            for(int i=0; i < preys_team->players.size(); i++)
+            {
+                // std::cout << preys_team->players[i] << std::endl;
+                float distance = getDistanceToPlayer(preys_team->players[i]);
+                //std::cout << "Get Distance: "<< isnan(distance) << std::endl;
+
+                if( (distance < near_player_distance) && (!isnan(distance)))
+                {
+                    near_player_distance = distance;
+                    index_near_player    = i;
+                }
+            }
+        }
+        //Behaviour follow the closest prey
+        move(msg.max_displacement, getAngleToPLayer(preys_team->players[index_near_player]) );
+    }*/
+
+
+
+
+    //##########################
+
+    double distance_to_arena = getDistanceToArena();
+            ROS_INFO("distance_to_arena = %f", distance_to_arena);
+
+            if (distance_to_arena > 6) //behaviour move to the center of arena
+            {
+                string arena = "/map";
+                move(msg.max_displacement, getAngleToPLayer(arena));
+            }
+
+
+            double near_player_distance = 1000.0;
+            int index_near_player = 0;
+
+            std::cout << "Number of Preys: "<< preys_team->players.size() << std::endl;
+
+            for(int i=0; i < msg.blue_alive.size(); i++)
+            {
+               // std::cout << preys_team->players[i] << std::endl;
+                float distance = getDistanceToPlayer(msg.blue_alive[i]);
+                //std::cout << "Get Distance: "<< isnan(distance) << std::endl;
+
+                if( (distance < near_player_distance) && (!isnan(distance)))
+                {
+                    near_player_distance = distance;
+                    index_near_player    = i;
+                }
+            }
+
+          //Behaviour follow the closest prey
+          move(msg.max_displacement, getAngleToPLayer(msg.blue_alive[index_near_player]) );
+
+
+    //Caça e Foge
+    /*void play(const rwsfi2016_msgs::MakeAPlay& msg)
+        {
+            //Behaviour follow the closest prey
+            double dist_min = 100000;
+            int angleMin = 0;
+            double dist = 0;
+            for (int pl=0; pl < preys_team->players.size(); pl++) {
+                dist = getDistanceToPlayer(preys_team->players[pl]);
+                if ((dist < dist_min) && (!isnan(dist) ) ) {
+                    angleMin = pl;
+                    dist_min = dist;
+                }
+            }
+            double dist_min_hunter = 100000;
+            double dist_hunter = 0;
+            int angleMinHunter = 0;
+            for (int pl=0; pl < hunters_team->players.size(); pl++) {
+                dist_hunter = getDistanceToPlayer(hunters_team->players[pl]);
+                if ((dist_hunter < dist_min_hunter) && (!isnan(dist_hunter))) {
+                    angleMinHunter = pl;
+                    dist_min_hunter = dist_hunter;
+                }
+            }
+            // Find team mates
+            double dist_min_team = 100000;
+            double dist_team = 0;
+            int angleMinteam = 0;
+            for (int pl=0; pl < my_team->players.size(); pl++) {
+                dist_team = getDistanceToPlayer(my_team->players[pl]);
+                if ((dist_team < dist_min_team) && (!isnan(dist_team))) {
+                    angleMinteam = pl;
+                    dist_min_team = dist_team;
+                }
+            }
+
+            double finalAngle = 0.0;
+            if (dist_min_hunter < dist_min) {
+                if (dist_min_hunter < dist_min_team) {
+                    ROS_INFO_STREAM("Hunter mais proximo: " << hunters_team->players[angleMinHunter] << " angle: " << getAngleToPLayer(hunters_team->players[angleMin]));
+                    double angle_temp = getAngleToPLayer(hunters_team->players[angleMinHunter]);
+                    finalAngle = angle_temp+M_PI;
+                    if (angle_temp > 0)
+                        finalAngle = angle_temp-M_PI;
+                    move(msg.max_displacement, finalAngle);
+                } else {
+                    ROS_INFO_STREAM("Team mais proximo: " << my_team->players[angleMinHunter] << " angle: " << getAngleToPLayer(my_team->players[angleMin]));
+                    double angle_temp = getAngleToPLayer(my_team->players[angleMinteam]);
+                    finalAngle = angle_temp+M_PI;
+                    if (angle_temp > 0)
+                        finalAngle = angle_temp-M_PI;
+                    move(msg.max_displacement, finalAngle);
+                }
+            } else {
+                ROS_INFO_STREAM("Preyer mais proximo: " << preys_team->players[angleMin] << " angle: " << getAngleToPLayer(preys_team->players[angleMin]));
+                move(msg.max_displacement, getAngleToPLayer(preys_team->players[angleMin]));
+            }
+        }*/
 };
 
 
