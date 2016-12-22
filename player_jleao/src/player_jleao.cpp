@@ -6,6 +6,16 @@
 #include <visualization_msgs/Marker.h>
 #include <rwsfi2016_libs/player.h>
 #include <rwsfi2016_msgs/GameQuery.h>
+#include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/Image.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/point_types.h>
+#include <pcl/PCLPointCloud2.h>
+#include <pcl/conversions.h>
+#include <pcl_ros/transforms.h>
+#include <pcl.h>
+#include <pcl/point_types.h>
+#include <pcl_ros/point_cloud.h>
 
 /* _________________________________
    |                                 |
@@ -13,6 +23,7 @@
    |_________________________________| */
 using namespace std;
 using namespace ros;
+
 
 
 /**
@@ -27,21 +38,34 @@ public:
      * @param pet_name pet name
      */
 
+    typedef pcl::PointXYZRGB PointT;
+    sensor_msgs::PointCloud2 pcll;
+
     bool respo(rwsfi2016_msgs::GameQuery::Request  &req,
                rwsfi2016_msgs::GameQuery::Response &res)
     {
-        res.resposta = "Hello";
+        pcl::PointCloud<PointT> cloud;
+        pcl::fromROSMsg(pcll, cloud);
+        res.resposta = "Banana";
         return true;
+    }
+
+    void callback(const sensor_msgs::PointCloud2 msg)
+    {
+        pcll = msg;
     }
 
     ros::Publisher publisher;
     ros::ServiceServer servico;
     visualization_msgs::Marker bocas_msg;
+    ros::Subscriber sub;
+
 
 
 
     MyPlayer(string player_name, string pet_name="/dog"): Player(player_name, pet_name){
         publisher = node.advertise<visualization_msgs::Marker>("/bocas", 1);
+        sub = node.subscribe<sensor_msgs::PointCloud2> ("/object_point_cloud", 1, &MyPlayer::callback, this);
         bocas_msg.header.frame_id = name;
         bocas_msg.ns = name;
         bocas_msg.id = 0;
