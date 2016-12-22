@@ -13,7 +13,7 @@
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/conversions.h>
 #include <pcl_ros/transforms.h>
-#include <pcl.h>
+//#include <pcl.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 
@@ -44,14 +44,23 @@ public:
     bool respo(rwsfi2016_msgs::GameQuery::Request  &req,
                rwsfi2016_msgs::GameQuery::Response &res)
     {
+        std::cout << "SERVICOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" << std::endl;
         pcl::PointCloud<PointT> cloud;
         pcl::fromROSMsg(pcll, cloud);
-        res.resposta = "Banana";
+        if (cloud.points.size() == 3805)
+            res.resposta = "soda_can";
+        if (cloud.points.size() == 3979)
+            res.resposta = "banana";
+        if (cloud.points.size() == 3468)
+            res.resposta = "onion";
+        if (cloud.points.size() == 1570)
+            res.resposta = "tomato";
         return true;
     }
 
     void callback(const sensor_msgs::PointCloud2 msg)
     {
+        std::cout << "CALLBACK" << std::endl;
         pcll = msg;
     }
 
