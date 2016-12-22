@@ -44,17 +44,41 @@ public:
     bool respo(rwsfi2016_msgs::GameQuery::Request  &req,
                rwsfi2016_msgs::GameQuery::Response &res)
     {
-        std::cout << "SERVICOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" << std::endl;
         pcl::PointCloud<PointT> cloud;
         pcl::fromROSMsg(pcll, cloud);
-        if (cloud.points.size() == 3805)
-            res.resposta = "soda_can";
-        if (cloud.points.size() == 3979)
+        // Object to analyze
+        double meanValR = 0.0;
+        double meanValG = 0.0;
+        double meanValB = 0.0;
+        int objectSize = 0;
+        for (int pt = 0; pt < cloud.points.size(); pt++) {
+            if (!isnan(cloud.points[pt].r)) {
+                meanValR += cloud.points[pt].r;
+                meanValG += cloud.points[pt].g;
+                meanValB += cloud.points[pt].b;
+                objectSize++;
+            }
+        }
+        // Compute mean
+        meanValR = meanValR/objectSize;
+        meanValG = meanValG/objectSize;
+        meanValB = meanValB/objectSize;
+        //        std::cout << "R: " << meanValR << std::endl;
+        //        std::cout << "G: " << meanValG << std::endl;
+        //        std::cout << "B: " << meanValB << std::endl;
+        if (meanValR > 130) {
             res.resposta = "banana";
-        if (cloud.points.size() == 3468)
-            res.resposta = "onion";
-        if (cloud.points.size() == 1570)
-            res.resposta = "tomato";
+        } else {
+            if (meanValR > 90) {
+                res.resposta = "tomato";
+            } else {
+                if (meanValB > 70) {
+                    res.resposta = "soda_can";
+                } else {
+                    res.resposta = "onion";
+                }
+            }
+        }
         return true;
     }
 
